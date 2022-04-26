@@ -1,0 +1,7 @@
+flysystem:
+    storages:
+        default.storage:
+            adapter: 'aws'
+            options:
+                client: 'app.images.s3'
+                bucket: '%env(resolve:AWS_S3_BUCKET)%'

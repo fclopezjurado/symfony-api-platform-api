@@ -1,0 +1,36 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    App\Api\Action\:
+        resource: '../src/Api/Action/'
+        tags: ['controller.service_arguments']
+
+    App\Api\Listener\JsonExceptionResponseTransformerListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 100 }
+
+    App\Api\Listener\JwtCreatedListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+
+    app.images.s3:
+        class: Aws\S3\S3Client
+        arguments:
+            - version: '%env(resolve:AWS_VERSION)%'
+              region: '%env(resolve:AWS_REGION)%'
+              endpoint: '%env(resolve:AWS_S3_ENDPOINT)%'
+              credentials:
+                  key: '%env(resolve:AWS_ACCESS_KEY_ID)%'
+                  secret: '%env(resolve:AWS_SECRET_ACCESS_KEY)%'
